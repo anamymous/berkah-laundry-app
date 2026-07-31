@@ -1,0 +1,20 @@
+# CircleCI configuration for Berkah Laundry static web app
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:lts
+    steps:
+      - checkout
+      - run:
+          name: Verify HTML file exists
+          command: test -f index.html && echo "index.html found"
+      - store_artifacts:
+          path: index.html
+          destination: index.html
+
+workflows:
+  sample:
+    jobs:
+      - build

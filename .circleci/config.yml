@@ -1,15 +1,22 @@
-# CircleCI configuration for Berkah Laundry static web app
 version: 2.1
 
 jobs:
   build:
+    # Static web app — Linux Docker executor; no macOS/Xcode needed
     docker:
-      - image: cimg/node:lts
+      - image: cimg/base:stable
     steps:
       - checkout
       - run:
           name: Verify HTML file exists
-          command: test -f index.html && echo "index.html found"
+          command: |
+            test -f index.html && echo "index.html found"
+      - run:
+          name: Validate HTML content
+          command: |
+            grep -q "<!DOCTYPE html>" index.html && echo "HTML5 doctype present"
+            grep -q "<title>" index.html && echo "Title tag present"
+            grep -q "</html>" index.html && echo "Closing html tag present"
       - store_artifacts:
           path: index.html
           destination: index.html

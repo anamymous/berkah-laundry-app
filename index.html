@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#047857">
-    <title>Kalkulatore Berkah Laundry - Firebase Edition</title>
+    <title>Kalkulatore Berkah Laundry - Edit Rincian Barang</title>
 
     <!-- PWA & Offline Cache Fallback Script -->
     <script>
@@ -22,12 +22,8 @@
     <!-- Chart.js untuk Grafik Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Library Konversi Struk ke PNG -->
+    <!-- Library untuk Konversi Struk HTML ke Gambar PNG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-    <!-- FIREBASE SDK (v10 Web Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         @media print {
@@ -57,9 +53,9 @@
             </div>
             <div class="flex items-center gap-2">
                 <span id="indikatorSync" class="text-xs bg-emerald-800 px-3 py-1 rounded-full text-emerald-100 flex items-center gap-1 font-semibold">
-                    <i data-lucide="wifi" class="w-4 h-4"></i> Memeriksa Firebase...
+                    <i data-lucide="wifi" class="w-4 h-4"></i> Memeriksa Koneksi...
                 </span>
-                <button onclick="muatDataFirebase()" class="bg-emerald-800 hover:bg-emerald-900 text-white text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+                <button onclick="muatDataCloud()" class="bg-emerald-800 hover:bg-emerald-900 text-white text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1">
                     <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
                 </button>
             </div>
@@ -94,6 +90,8 @@
 
         <!-- TAB 1: DASHBOARD -->
         <section id="tab-dashboard" class="tab-content space-y-6">
+            
+            <!-- RINGKASAN STATISTIK -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                     <div>
@@ -254,7 +252,7 @@
                     </div>
 
                     <button type="submit" id="btnSimpanTx" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                        <i data-lucide="save" class="w-5 h-5"></i> Simpan Transaksi Ke Firebase
+                        <i data-lucide="save" class="w-5 h-5"></i> Simpan Transaksi
                     </button>
                 </form>
             </div>
@@ -344,7 +342,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-4 mb-4 gap-3">
                     <div>
                         <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-                            <i data-lucide="list" class="w-5 h-5 text-emerald-600"></i> Daftar Riwayat Transaksi Firebase
+                            <i data-lucide="list" class="w-5 h-5 text-emerald-600"></i> Daftar Riwayat Transaksi
                         </h2>
                     </div>
 
@@ -378,7 +376,7 @@
 
     </main>
 
-    <!-- MODAL EDIT TRANSAKSI -->
+    <!-- MODAL EDIT TRANSAKSI (BISA EDIT DAFTAR BARANG/RINCIAN) -->
     <div id="modalEditTransaksi" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b pb-2">
@@ -409,6 +407,7 @@
                     </div>
                 </div>
 
+                <!-- AREA EDIT DAFTAR BARANG / RINCIAN BIAYA -->
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-slate-700">Rincian Barang / Layanan:</span>
@@ -417,6 +416,7 @@
                         </button>
                     </div>
 
+                    <!-- Pilihan jika transaksi jenis Kiloan -->
                     <div id="areaEditKiloanContainer" class="hidden space-y-2">
                         <input type="text" id="editTxLayananNama" placeholder="Nama Layanan Kiloan" class="w-full px-2.5 py-1 border border-slate-300 rounded font-semibold">
                         <div class="grid grid-cols-2 gap-2">
@@ -431,6 +431,7 @@
                         </div>
                     </div>
 
+                    <!-- Pilihan jika transaksi jenis Satuan -->
                     <div id="areaEditSatuanContainer" class="hidden space-y-2">
                         <div id="editTxListSatuanItems" class="space-y-2"></div>
                     </div>
@@ -466,7 +467,7 @@
         </div>
     </div>
 
-    <!-- MODAL KELOLA JENIS LAYANAN -->
+    <!-- MODAL KELOLA JENIS LAYANAN (DENGAN EDIT) -->
     <div id="modalLayananKiloan" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-4">
             <div class="flex items-center justify-between border-b pb-2">
@@ -478,6 +479,7 @@
                 </button>
             </div>
 
+            <!-- FORM TAMBAH / EDIT LAYANAN -->
             <form id="formTambahLayananKiloan" onsubmit="tambahAtauEditLayananKiloan(event)" class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-200 space-y-3 text-xs">
                 <div id="labelFormLayananHeader" class="font-bold text-emerald-900">+ Tambah Jenis Layanan Baru</div>
                 <input type="hidden" id="editLayananIndex" value="-1">
@@ -513,7 +515,7 @@
         </div>
     </div>
 
-    <!-- MODAL KELOLA KATALOG BARANG SATUAN -->
+    <!-- MODAL KELOLA KATALOG BARANG SATUAN (DENGAN EDIT) -->
     <div id="modalKatalog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-4">
             <div class="flex items-center justify-between border-b pb-2">
@@ -525,6 +527,7 @@
                 </button>
             </div>
 
+            <!-- FORM TAMBAH / EDIT KATALOG BARANG -->
             <form id="formTambahKatalog" onsubmit="tambahAtauEditKatalog(event)" class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
                 <div id="labelFormKatalogHeader" class="font-bold text-xs text-slate-700">+ Tambah Barang / Pakaian Baru</div>
                 <input type="hidden" id="editKatalogIndex" value="-1">
@@ -601,7 +604,7 @@
         </div>
     </div>
 
-    <!-- MODAL NOTA STRUK INDIVIDUAL -->
+    <!-- MODAL NOTA / STRUK TRANSAKSI SATUAN -->
     <div id="modalNota" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 print:p-0">
         <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-slate-800 space-y-4 print:shadow-none print:w-full" id="areaNotaPrint">
             <div class="text-center border-b pb-3 border-dashed border-slate-300">
@@ -708,42 +711,18 @@
         </div>
     </div>
 
-    <!-- LOGIKA SCRIPT UTAMA FIREBASE INTEGRATION -->
+    <!-- LOGIKA SCRIPT UTAMA -->
     <script>
         if (window.lucide) lucide.createIcons();
 
-        // ⚠️ KONFIGURASI FIREBASE ANDA
-        const firebaseConfig = {
-            apiKey: "AIzaSyDpl5sZqHsTk52KwqyJjeRCFw9BZ5AORDg",
-            authDomain: "berkah-laundry-kasir.firebaseapp.com",
-            projectId: "berkah-laundry-kasir",
-            storageBucket: "berkah-laundry-kasir.firebasestorage.app",
-            messagingSenderId: "568235200768",
-            appId: "1:568235200768:web:3a57506e2efe91391323e5"
-        };
+        const URL_GOOGLE_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwydQYx_ZXByHLqFAsuEe2nPGyRKw24x5nbPAaKcrulwZTtFNWVEPR-HNwfUtC5piJV/exec";
 
-        // INISIALISASI FIREBASE & FIRESTORE
-        let db = null;
-        let dbTransaksiRef = null;
-        let dbPelangganRef = null;
-
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            
-            // Aktifkan Offline Persistence
-            db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
-
-            dbTransaksiRef = db.collection("transaksi");
-            dbPelangganRef = db.collection("pelanggan");
-        } catch(err) {
-            console.warn("Firebase Config belum diisi.");
-        }
-
-        // STORAGE LOKAL FALLBACK
+        // STORAGE LOKAL PERANGKAT
         let dataTransaksi = JSON.parse(localStorage.getItem('laundry_data_local')) || [];
         let dataPelanggan = JSON.parse(localStorage.getItem('laundry_pelanggan_local')) || ["Budi Santoso", "Ibu Ani", "Pak Ahmad", "Pelanggan Umum"];
+        let antreanSyncOffline = JSON.parse(localStorage.getItem('laundry_sync_queue')) || [];
 
+        // KATALOG BARANG DEFAULT
         const DEFAULT_KATALOG = [
             { nama: 'Kemeja / Kaos', harga: { 'Cuci Komplit': 8000, 'Cuci Kering': 6000, 'Setrika Saja': 5000, 'Express 1 Hari': 12000 } },
             { nama: 'Celana Panjang / Jeans', harga: { 'Cuci Komplit': 10000, 'Cuci Kering': 8000, 'Setrika Saja': 6000, 'Express 1 Hari': 15000 } },
@@ -756,6 +735,7 @@
             { nama: 'Lainnya (Custom)', harga: { 'Cuci Komplit': 15000, 'Cuci Kering': 12000, 'Setrika Saja': 10000, 'Express 1 Hari': 20000 } }
         ];
 
+        // LAYANAN DEFAULT
         const DEFAULT_LAYANAN_KILOAN = [
             { nama: 'Cuci Komplit', harga: 10000, hari: 3 },
             { nama: 'Cuci Kering', harga: 7000, hari: 3 },
@@ -767,6 +747,7 @@
         let LAYANAN_KILOAN = JSON.parse(localStorage.getItem('laundry_kiloan_local')) || DEFAULT_LAYANAN_KILOAN;
 
         let currentFilterAmbil = 'semua';
+        let sedangSync = false;
         let myChartInstance = null;
 
         function simpanKeLokal() {
@@ -774,6 +755,18 @@
             localStorage.setItem('laundry_pelanggan_local', JSON.stringify(dataPelanggan));
             localStorage.setItem('laundry_katalog_local', JSON.stringify(KATALOG_BARANG));
             localStorage.setItem('laundry_kiloan_local', JSON.stringify(LAYANAN_KILOAN));
+            localStorage.setItem('laundry_sync_queue', JSON.stringify(antreanSyncOffline));
+        }
+
+        function renderSelectLayananKiloan() {
+            const select = document.getElementById('layananKiloan');
+            if (!select) return;
+
+            select.innerHTML = LAYANAN_KILOAN.map(item => 
+                `<option value="${item.harga}" data-hari="${item.hari}">${item.nama} (Rp ${item.harga.toLocaleString('id-ID')}/kg - ${item.hari} Hari)</option>`
+            ).join('');
+
+            updateEstimasiDanTotal();
         }
 
         function tampilkanStatusSync(pesan, tipe = "info") {
@@ -792,97 +785,18 @@
             const ind = document.getElementById('indikatorSync');
             if (!ind) return;
             if (navigator.onLine) {
-                ind.className = "text-xs bg-emerald-800 text-emerald-100 px-3 py-1 rounded-full font-semibold flex items-center gap-1";
-                ind.innerHTML = `<i data-lucide="wifi" class="w-4 h-4"></i> Online (Firebase Firestore)`;
+                if (antreanSyncOffline.length > 0) {
+                    ind.className = "text-xs bg-amber-600 text-white px-3 py-1 rounded-full font-semibold flex items-center gap-1";
+                    ind.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 animate-spin"></i> ${antreanSyncOffline.length} Perubahan Menunggu Sync`;
+                } else {
+                    ind.className = "text-xs bg-emerald-800 text-emerald-100 px-3 py-1 rounded-full font-semibold flex items-center gap-1";
+                    ind.innerHTML = `<i data-lucide="wifi" class="w-4 h-4"></i> Online (Terhubung Cloud)`;
+                }
             } else {
-                ind.className = "text-xs bg-amber-600 text-white px-3 py-1 rounded-full font-semibold flex items-center gap-1";
-                ind.innerHTML = `<i data-lucide="wifi-off" class="w-4 h-4"></i> Offline Mode (Local Cache)`;
+                ind.className = "text-xs bg-rose-600 text-white px-3 py-1 rounded-full font-semibold flex items-center gap-1";
+                ind.innerHTML = `<i data-lucide="wifi-off" class="w-4 h-4"></i> Offline Mode (${antreanSyncOffline.length} Antrean)`;
             }
             if (window.lucide) lucide.createIcons();
-        }
-
-        // LISTEN REALTIME DATA DARI FIREBASE
-        function muatDataFirebase() {
-            renderSelectLayananKiloan();
-            
-            if (!db) {
-                tampilkanStatusSync("⚠️ Firebase Config belum diisi. Menggunakan penyimpanan lokal.", "warning");
-                renderTabel();
-                renderSelectPelanggan();
-                renderDropdownPengambilan();
-                updateChartPelanggan();
-                return;
-            }
-
-            tampilkanStatusSync("⏳ Terhubung ke Firebase Firestore Realtime...", "info");
-
-            // Realtime Listener Transaksi
-            dbTransaksiRef.orderBy("id", "desc").onSnapshot(snapshot => {
-                dataTransaksi = [];
-                snapshot.forEach(doc => {
-                    dataTransaksi.push(doc.data());
-                });
-                simpanKeLokal();
-                renderTabel();
-                renderDropdownPengambilan();
-                updateChartPelanggan();
-                tampilkanStatusSync("✅ Data Berhasil Disinkronkan dengan Firebase!", "success");
-                setTimeout(() => document.getElementById('statusBarSync').classList.add('hidden'), 3000);
-            }, err => {
-                tampilkanStatusSync("📡 Memakai Data Lokal (Koneksi Firebase terputus).", "warning");
-            });
-
-            // Realtime Listener Pelanggan
-            dbPelangganRef.onSnapshot(snapshot => {
-                if (!snapshot.empty) {
-                    let listPl = [];
-                    snapshot.forEach(doc => listPl.push(doc.data().nama));
-                    if (listPl.length > 0) dataPelanggan = listPl;
-                    simpanKeLokal();
-                    renderSelectPelanggan();
-                }
-            });
-
-            perbaruiIndikatorStatus();
-        }
-
-        function simpanTransaksiCloud(tx) {
-            simpanKeLokal();
-            if (dbTransaksiRef) {
-                dbTransaksiRef.doc(tx.id.toString()).set(tx).catch(() => {});
-            }
-        }
-
-        function updateTransaksiCloud(tx) {
-            simpanKeLokal();
-            if (dbTransaksiRef) {
-                dbTransaksiRef.doc(tx.id.toString()).set(tx, { merge: true }).catch(() => {});
-            }
-        }
-
-        function hapusTransaksiCloud(id) {
-            simpanKeLokal();
-            if (dbTransaksiRef) {
-                dbTransaksiRef.doc(id.toString()).delete().catch(() => {});
-            }
-        }
-
-        function simpanPelangganCloud(nama) {
-            simpanKeLokal();
-            if (dbPelangganRef) {
-                dbPelangganRef.doc(nama).set({ nama: nama }).catch(() => {});
-            }
-        }
-
-        function renderSelectLayananKiloan() {
-            const select = document.getElementById('layananKiloan');
-            if (!select) return;
-
-            select.innerHTML = LAYANAN_KILOAN.map(item => 
-                `<option value="${item.harga}" data-hari="${item.hari}">${item.nama} (Rp ${item.harga.toLocaleString('id-ID')}/kg - ${item.hari} Hari)</option>`
-            ).join('');
-
-            updateEstimasiDanTotal();
         }
 
         function updateChartPelanggan() {
@@ -950,6 +864,104 @@
                     }
                 }
             });
+        }
+
+        async function prosesProsesOtomatisAntreanCloud() {
+            if (!navigator.onLine || sedangSync || antreanSyncOffline.length === 0) return;
+
+            sedangSync = true;
+            perbaruiIndikatorStatus();
+            tampilkanStatusSync(`🔄 Mengirim ${antreanSyncOffline.length} perubahan offline ke Google Sheets...`, "info");
+
+            const itemsToSync = [...antreanSyncOffline];
+
+            try {
+                const payloadEncoded = encodeURIComponent(JSON.stringify({ action: "syncBatch", items: itemsToSync }));
+                await fetch(URL_GOOGLE_APPS_SCRIPT + "?payload=" + payloadEncoded, { method: 'GET', redirect: 'follow' });
+
+                antreanSyncOffline = antreanSyncOffline.filter(item => !itemsToSync.includes(item));
+                simpanKeLokal();
+                tampilkanStatusSync("✅ Otomatis Tersinkronisasi dengan Google Sheets!", "success");
+                setTimeout(() => document.getElementById('statusBarSync').classList.add('hidden'), 3000);
+            } catch (err) {
+                tampilkanStatusSync("⚠️ Gagal koneksi cloud. Akan dicoba lagi secara otomatis saat koneksi stabil.", "warning");
+            } finally {
+                sedangSync = false;
+                perbaruiIndikatorStatus();
+            }
+        }
+
+        async function muatDataCloud() {
+            renderSelectLayananKiloan();
+            if (!navigator.onLine) {
+                tampilkanStatusSync("📡 Mode Offline: Menampilkan data lokal di perangkat Anda.", "warning");
+                renderTabel();
+                renderSelectPelanggan();
+                renderDropdownPengambilan();
+                updateChartPelanggan();
+                perbaruiIndikatorStatus();
+                return;
+            }
+
+            if (antreanSyncOffline.length > 0) {
+                await prosesProsesOtomatisAntreanCloud();
+            }
+
+            tampilkanStatusSync("⏳ Memuat & Memperbarui data dari Google Sheets...", "info");
+            try {
+                let response = await fetch(URL_GOOGLE_APPS_SCRIPT, { method: 'GET', redirect: 'follow' });
+                let result = await response.json();
+                
+                if (result.transaksi) {
+                    dataTransaksi = result.transaksi;
+                }
+                if (result.pelanggan && result.pelanggan.length > 0) {
+                    dataPelanggan = result.pelanggan;
+                }
+                
+                dataTransaksi.sort((a, b) => b.id - a.id);
+                simpanKeLokal();
+                
+                renderTabel();
+                renderSelectPelanggan();
+                renderDropdownPengambilan();
+                updateChartPelanggan();
+                tampilkanStatusSync("✅ Data Berhasil Disinkronkan dengan Google Sheets!", "success");
+                setTimeout(() => document.getElementById('statusBarSync').classList.add('hidden'), 3000);
+            } catch (error) {
+                tampilkanStatusSync("📡 Memakai Data Lokal (Gagal terhubung ke Sheets).", "warning");
+                updateChartPelanggan();
+            } finally {
+                perbaruiIndikatorStatus();
+            }
+        }
+
+        function tambahKeAntreanSync(payload) {
+            antreanSyncOffline.push(payload);
+            simpanKeLokal();
+            perbaruiIndikatorStatus();
+
+            if (navigator.onLine) {
+                prosesProsesOtomatisAntreanCloud();
+            } else {
+                tampilkanStatusSync("📡 Tersimpan di perangkat (Offline). Akan otomatis terkirim saat tersambung internet.", "warning");
+            }
+        }
+
+        function simpanTransaksiCloud(tx) {
+            tambahKeAntreanSync({ action: "saveTransaksi", data: tx });
+        }
+
+        function updateTransaksiCloud(tx) {
+            tambahKeAntreanSync({ action: "updateTransaksi", data: tx });
+        }
+
+        function hapusTransaksiCloud(id) {
+            tambahKeAntreanSync({ action: "deleteTransaksi", id: id });
+        }
+
+        function simpanPelangganCloud(nama) {
+            tambahKeAntreanSync({ action: "savePelanggan", nama: nama });
         }
 
         function gantiTab(targetTab) {
@@ -1051,12 +1063,12 @@
             if (confirm(`Apakah Anda YAKIN ingin menghapus "${nama}" dari daftar pelanggan?`)) {
                 dataPelanggan = dataPelanggan.filter(p => p !== nama);
                 simpanKeLokal();
-                if (dbPelangganRef) dbPelangganRef.doc(nama).delete().catch(() => {});
                 renderSelectPelanggan();
                 bukaModalKelolaPelanggan();
             }
         }
 
+        // FUNGSI KELOLA JENIS LAYANAN (DENGAN TAMBAH & EDIT)
         function bukaModalLayananKiloan() {
             batalEditLayananMode();
             renderDaftarLayananKiloanModal();
@@ -1156,6 +1168,7 @@
             }
         }
 
+        // FUNGSI KELOLA KATALOG BARANG SATUAN (DENGAN EDIT)
         function bukaModalKatalog() {
             batalEditKatalogMode();
             renderDaftarKatalogModal();
@@ -1262,6 +1275,7 @@
             }
         }
 
+        // FUNGSI EDIT TRANSAKSI LAPORAN (DENGAN EDIT RINCIAN BARANG)
         function bukaModalEditTransaksi(id) {
             const item = dataTransaksi.find(t => t.id === id);
             if (!item) return;
@@ -1280,12 +1294,14 @@
             const btnTambahSatuan = document.getElementById('btnEditTambahItemSatuan');
 
             if (Array.isArray(item.itemsSatuan) && item.itemsSatuan.length > 0) {
+                // Transaksi Satuan
                 areaKiloan.classList.add('hidden');
                 areaSatuan.classList.remove('hidden');
                 btnTambahSatuan.classList.remove('hidden');
 
                 renderEditSatuanItems(item.itemsSatuan);
             } else {
+                // Transaksi Kiloan
                 areaSatuan.classList.add('hidden');
                 areaKiloan.classList.remove('hidden');
                 btnTambahSatuan.classList.add('hidden');
@@ -1402,6 +1418,7 @@
             item.status = document.getElementById('editTxStatus').value;
             item.isDiambil = document.getElementById('editTxIsDiambil').value === "true";
 
+            // Update Rincian Barang
             if (Array.isArray(item.itemsSatuan) && item.itemsSatuan.length > 0) {
                 const newItemsSatuan = [];
                 const rows = document.querySelectorAll('.edit-satuan-item-row');
@@ -2022,7 +2039,7 @@
                 return;
             }
 
-            let csvContent = "\uFEFF";
+            let csvContent = "﻿";
             csvContent += "ID Transaksi;Tanggal Masuk;Tanggal Ambil;Nama Pelanggan;Layanan/Item;Rincian Perhitungan;Total (Rp);Status Bayar;Status Cucian\n";
 
             dataBulanIni.forEach(t => {
@@ -2092,7 +2109,9 @@
             if (!item) return;
 
             if (item.status !== 'Lunas') {
-                if (!confirm(`⚠️ CATATAN: Tagihan Rp ${item.total.toLocaleString('id-ID')} atas nama ${item.nama} BELUM LUNAS.\n\nSerahkan barang sekarang tanpa pelunasan?`)) {
+                if (!confirm(`⚠️ CATATAN: Tagihan Rp ${item.total.toLocaleString('id-ID')} atas nama ${item.nama} BELUM LUNAS.
+
+Serahkan barang sekarang tanpa pelunasan?`)) {
                     return;
                 }
             }
@@ -2244,6 +2263,7 @@
         // EVENT LISTENER DETEKSI INTERNET AUTOMATIC
         window.addEventListener('online', () => {
             tampilkanStatusSync("🌐 Terhubung ke Internet! Melakukan Sinkronisasi Otomatis...", "success");
+            prosesProsesOtomatisAntreanCloud();
         });
 
         window.addEventListener('offline', () => {
@@ -2253,7 +2273,7 @@
 
         // Inisialisasi Pertama
         setTanggalDefault();
-        muatDataFirebase();
+        muatDataCloud();
     </script>
 </body>
 </html>
